@@ -84,6 +84,34 @@ func (cfg *AnonymizerConfig) GetAllNamingPatterns() ([]NamingPattern, error) {
 	return namingPatterns, nil
 }
 
+type RegexPattern struct {
+	Category string
+	Regex    string
+}
+
+// GetAllRegexes returns all the regex patterns configured for the anonymizer,
+// grouped by category. It loops through all the LogConfigs and extracts the regexes
+// into a slice of RegexPattern structs.
+func (cfg *AnonymizerConfig) GetAllRegexes() ([]RegexPattern, error) {
+	var regexes = []RegexPattern{}
+
+	for _, log := range cfg.LogConfigs {
+		for _, regex := range log.Regexes {
+			regexes = append(regexes, RegexPattern{
+				Category: log.Category,
+				Regex:    regex,
+			})
+		}
+	}
+
+	if len(regexes) == 0 {
+		return regexes, fmt.Errorf("no regexes found for %s", cfg.Version)
+	}
+
+	return regexes, nil
+
+}
+
 // GetLogConfigByCategory returns the LogConfig for the given category from the
 // AnonymizerConfig. It loops through all the LogConfigs and returns the one
 // where the Category matches the passed in category string. If no match is found,
