@@ -12,14 +12,14 @@ type AnonymizerConfiguration struct {
 }
 
 type AnonymizerConfig struct {
-	Version string      `yaml:"version"` // Version identifier
-	Logs    []LogConfig `yaml:"logs"`
+	Version    string      `yaml:"version"` // Version identifier
+	LogConfigs []LogConfig `yaml:"logs"`
 }
 
 type LogConfig struct {
-	Category      string   `yaml:"category"`
-	NamingPattern []string `yaml:"namingPattern"`
-	Regexes       []string `yaml:"regexes"`
+	Category       string   `yaml:"category"`
+	NamingPatterns []string `yaml:"namingPattern"`
+	Regexes        []string `yaml:"regexes"`
 }
 
 // LoadConfig loads the anonymizer configuration from the YAML file at the given path.
@@ -68,8 +68,8 @@ type NamingPattern struct {
 func (cfg *AnonymizerConfig) GetAllNamingPatterns() ([]NamingPattern, error) {
 	var namingPatterns = []NamingPattern{}
 
-	for _, log := range cfg.Logs {
-		for _, pattern := range log.NamingPattern {
+	for _, log := range cfg.LogConfigs {
+		for _, pattern := range log.NamingPatterns {
 			namingPatterns = append(namingPatterns, NamingPattern{
 				Category: log.Category,
 				Pattern:  pattern,
@@ -89,9 +89,9 @@ func (cfg *AnonymizerConfig) GetAllNamingPatterns() ([]NamingPattern, error) {
 // where the Category matches the passed in category string. If no match is found,
 // it returns an error.
 func (cfg *AnonymizerConfig) GetLogConfigByCategory(category string) (*LogConfig, error) {
-	for _, log := range cfg.Logs {
-		if log.Category == category {
-			return &log, nil
+	for _, logCfg := range cfg.LogConfigs {
+		if logCfg.Category == category {
+			return &logCfg, nil
 		}
 	}
 	return nil, fmt.Errorf("no config found for category %s under %s", category, cfg.Version)
