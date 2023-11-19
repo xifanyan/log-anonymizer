@@ -33,7 +33,7 @@ var (
 		Flags: []cli.Flag{
 			Version,
 		},
-		Action: listAllRegexes,
+		Action: listAllRegexPatterns,
 	}
 
 	Commands = []*cli.Command{
@@ -69,7 +69,7 @@ func listAllNamingPatterns(c *cli.Context) error {
 	return err
 }
 
-func listAllRegexes(c *cli.Context) error {
+func listAllRegexPatterns(c *cli.Context) error {
 	var err error
 
 	yaml, err := LoadConfig(c.String("config"))
