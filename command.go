@@ -18,7 +18,7 @@ var (
 var (
 	ListAllNamingPatterns = &cli.Command{
 		Name:    "listAllNamingPatterns",
-		Usage:   `log-anonymizer listNamingPatterns`,
+		Usage:   `log-anonymizer listAllNamingPatterns`,
 		Aliases: []string{"ln"},
 		Flags: []cli.Flag{
 			Version,
@@ -28,7 +28,7 @@ var (
 
 	ListAllRegexes = &cli.Command{
 		Name:    "listAllRegexes",
-		Usage:   `log-anonymizer listRegexes`,
+		Usage:   `log-anonymizer listAllRegexes`,
 		Aliases: []string{"lr"},
 		Flags: []cli.Flag{
 			Version,
