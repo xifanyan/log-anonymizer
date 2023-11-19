@@ -11,8 +11,11 @@ import (
 const (
 	DEFAULT_LOGTYPE     = "auto"
 	DEFAULT_CONFIG      = "config.yaml"
+	DEFAULT_AXC_VERSION = "default"
 	DEFAULT_OBFUSCATION = "_CONFIDENTIAL_"
 )
+
+var GlobalConfig *AnonymizerConfig
 
 func main() {
 	app := &cli.App{
@@ -33,6 +36,12 @@ func main() {
 				Value:   DEFAULT_CONFIG,
 			},
 			&cli.StringFlag{
+				Name:    "axcVersion",
+				Aliases: []string{"a"},
+				Usage:   "axcelerate version",
+				Value:   DEFAULT_AXC_VERSION,
+			},
+			&cli.StringFlag{
 				Name:    "obfuscation",
 				Aliases: []string{"s"},
 				Usage:   "",
@@ -47,11 +56,29 @@ func main() {
 		},
 		Commands: Commands,
 		Before: func(c *cli.Context) error {
+			var err error
+
 			zerolog.SetGlobalLevel(zerolog.ErrorLevel)
 			if c.Bool("debug") {
 				zerolog.SetGlobalLevel(zerolog.DebugLevel)
 			}
 			log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+
+			log.Debug().Msgf("axcVersion: %+v", c.String("axcVersion"))
+
+			yamlCfg, err := LoadConfig(c.String("config"))
+			if err != nil {
+				return err
+			}
+			log.Debug().Msgf("yaml Config: %+v", yamlCfg)
+
+			// DO NOT USE := to set global variable due to variable shawdowing
+			GlobalConfig, err = yamlCfg.GetAnonymizerConfigByAxcVersion(c.String("axcVersion"))
+			if err != nil {
+				return err
+			}
+			log.Debug().Msgf("GlobalConfig: %+v", GlobalConfig)
+
 			return nil
 		},
 	}

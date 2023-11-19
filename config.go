@@ -8,11 +8,11 @@ import (
 )
 
 type AnonymizerConfiguration struct {
-	Configs []AnonymizerConfig `yaml:"anonymizer"`
+	AnonymizerConfigs []AnonymizerConfig `yaml:"anonymizer"`
 }
 
 type AnonymizerConfig struct {
-	Version    string      `yaml:"version"` // Version identifier
+	AxcVersion string      `yaml:"axcVersion"` // axcelerate version
 	LogConfigs []LogConfig `yaml:"logs"`
 }
 
@@ -48,10 +48,10 @@ func LoadConfig(path string) (*AnonymizerConfiguration, error) {
 // AnonymizerConfiguration. It loops through all the Configs and returns the one
 // where the Version matches the passed in version string. If no match is found,
 // it returns an error.
-func (cfg *AnonymizerConfiguration) GetAnonymizerConfigByVersion(version string) (*AnonymizerConfig, error) {
-	for _, log := range cfg.Configs {
-		if log.Version == version {
-			return &log, nil
+func (cfg *AnonymizerConfiguration) GetAnonymizerConfigByAxcVersion(version string) (*AnonymizerConfig, error) {
+	for _, anonymizerCfg := range cfg.AnonymizerConfigs {
+		if anonymizerCfg.AxcVersion == version {
+			return &anonymizerCfg, nil
 		}
 	}
 	return nil, fmt.Errorf("no config found for version %s", version)
@@ -78,7 +78,7 @@ func (cfg *AnonymizerConfig) GetAllNamingPatterns() ([]NamingPattern, error) {
 	}
 
 	if len(namingPatterns) == 0 {
-		return namingPatterns, fmt.Errorf("no naming patterns found for %s", cfg.Version)
+		return namingPatterns, fmt.Errorf("no naming patterns found for %s", cfg.AxcVersion)
 	}
 
 	return namingPatterns, nil
@@ -105,7 +105,7 @@ func (cfg *AnonymizerConfig) GetAllRegexPatterns() ([]RegexPattern, error) {
 	}
 
 	if len(regexes) == 0 {
-		return regexes, fmt.Errorf("no regexes found for %s", cfg.Version)
+		return regexes, fmt.Errorf("no regexes found for %s", cfg.AxcVersion)
 	}
 
 	return regexes, nil
@@ -122,5 +122,5 @@ func (cfg *AnonymizerConfig) GetLogConfigByCategory(category string) (*LogConfig
 			return &logCfg, nil
 		}
 	}
-	return nil, fmt.Errorf("no config found for category %s under %s", category, cfg.Version)
+	return nil, fmt.Errorf("no config found for category %s under %s", category, cfg.AxcVersion)
 }

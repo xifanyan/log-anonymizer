@@ -7,33 +7,18 @@ import (
 )
 
 var (
-	Version = &cli.StringFlag{
-		Name:    "version",
-		Aliases: []string{"v"},
-		Usage:   "axcelerate version",
-		Value:   "default",
-	}
-)
-
-var (
 	ListAllNamingPatterns = &cli.Command{
 		Name:    "listAllNamingPatterns",
 		Usage:   `log-anonymizer listAllNamingPatterns`,
 		Aliases: []string{"ln"},
-		Flags: []cli.Flag{
-			Version,
-		},
-		Action: listAllNamingPatterns,
+		Action:  listAllNamingPatterns,
 	}
 
 	ListAllRegexPatterns = &cli.Command{
 		Name:    "listAllRegexPatterns",
 		Usage:   `log-anonymizer listAllRegexPatterns`,
 		Aliases: []string{"lr"},
-		Flags: []cli.Flag{
-			Version,
-		},
-		Action: listAllRegexPatterns,
+		Action:  listAllRegexPatterns,
 	}
 
 	Commands = []*cli.Command{
@@ -42,20 +27,13 @@ var (
 	}
 )
 
+// listAllNamingPatterns lists all the naming patterns configured for the anonymizer,
+// grouped by category. It calls GetAllNamingPatterns() on the global config to get
+// the patterns, then prints them out formatted.
 func listAllNamingPatterns(c *cli.Context) error {
 	var err error
 
-	yaml, err := LoadConfig(c.String("config"))
-	if err != nil {
-		return err
-	}
-
-	cfg, err := yaml.GetAnonymizerConfigByVersion(c.String("version"))
-	if err != nil {
-		return err
-	}
-
-	namingPatterns, err := cfg.GetAllNamingPatterns()
+	namingPatterns, err := GlobalConfig.GetAllNamingPatterns()
 	if err != nil {
 		return err
 	}
@@ -63,31 +41,27 @@ func listAllNamingPatterns(c *cli.Context) error {
 	i := 0
 	for _, pattern := range namingPatterns {
 		i++
-		fmt.Printf("%-5d%-20s%s\n", i, pattern.Category, pattern.Pattern)
+		fmt.Printf("%-3d%-16s%s\n", i, pattern.Category, pattern.Pattern)
 	}
 
 	return err
 }
 
+// listAllRegexPatterns lists all the regex patterns configured for the anonymizer,
+// grouped by category. It calls GetAllRegexPatterns() on the global config to get
+// the patterns, then prints them out formatted.
 func listAllRegexPatterns(c *cli.Context) error {
 	var err error
 
-	yaml, err := LoadConfig(c.String("config"))
+	regexPatterns, err := GlobalConfig.GetAllRegexPatterns()
 	if err != nil {
 		return err
 	}
-
-	cfg, err := yaml.GetAnonymizerConfigByVersion(c.String("version"))
-	if err != nil {
-		return err
-	}
-
-	regexes, err := cfg.GetAllRegexPatterns()
 
 	i := 0
-	for _, pattern := range regexes {
+	for _, pattern := range regexPatterns {
 		i++
-		fmt.Printf("%-5d%-20s%s\n", i, pattern.Category, pattern.Regex)
+		fmt.Printf("%-3d%-16s%s\n", i, pattern.Category, pattern.Regex)
 	}
 
 	return err

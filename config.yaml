@@ -1,6 +1,6 @@
 ---
 anonymizer:
-  - version: default
+  - axcVersion: default
     logs:
       - category: engine
         namingPatterns: # Log Naming Patterns
@@ -12,7 +12,7 @@ anonymizer:
       - category: launcherservice
         namingPatterns:
           - Launcher
-  - version: v22.0
+  - axcVersion: v22.0
     logs:
       - category: launcherservice
         namingPatterns: # Log Naming Patterns
