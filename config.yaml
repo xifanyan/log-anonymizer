@@ -2,19 +2,19 @@
 anonymizer:
   - axcVersion: default
     logs:
-      - category: engine
+      - fileType: engine
         namingPatterns: # Log Naming Patterns
           - distributedEngine.log 
         regexPatterns: # Regexes used to search for log entries
           - ".*Processed login for user '(.*?)'.*display name: '(.*?)'.*email address: '(.*?)'.*SINGLEMINDSERVER.(.*?)[.].*"
           - ".*Start login for user '(.*?)', profile: '(.*?)'.*SINGLEMINDSERVER.(.*?).Security.*"
           - ".*SearchError User : (.*?) Duration .*"
-      - category: launcherservice
+      - fileType: launcherservice
         namingPatterns:
           - Launcher
   - axcVersion: v22.0
     logs:
-      - category: launcherservice
+      - fileType: launcherservice
         namingPatterns: # Log Naming Patterns
           - Launcher
         regexPatterns: # Regexes used to search for log entries

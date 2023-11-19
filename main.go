@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	DEFAULT_LOGTYPE     = "auto"
+	DEFAULT_FILETYPE    = "*"
 	DEFAULT_CONFIG      = "config.yaml"
 	DEFAULT_AXC_VERSION = "default"
 	DEFAULT_OBFUSCATION = "_CONFIDENTIAL_"
@@ -24,10 +24,10 @@ func main() {
 		Usage:   "Axcelerate Log Anonymizer",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:    "logType",
+				Name:    "fileType",
 				Aliases: []string{"t"},
-				Usage:   "Log Type",
-				Value:   DEFAULT_LOGTYPE,
+				Usage:   "File Type",
+				Value:   DEFAULT_FILETYPE,
 			},
 			&cli.StringFlag{
 				Name:    "config",
@@ -37,7 +37,7 @@ func main() {
 			},
 			&cli.StringFlag{
 				Name:    "axcVersion",
-				Aliases: []string{"a"},
+				Aliases: []string{"x"},
 				Usage:   "axcelerate version",
 				Value:   DEFAULT_AXC_VERSION,
 			},

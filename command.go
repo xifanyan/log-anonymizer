@@ -7,33 +7,33 @@ import (
 )
 
 var (
-	ListAllNamingPatterns = &cli.Command{
-		Name:    "listAllNamingPatterns",
-		Usage:   `log-anonymizer listAllNamingPatterns`,
+	ListNamingPatterns = &cli.Command{
+		Name:    "listNamingPatterns",
+		Usage:   `log-anonymizer listNamingPatterns`,
 		Aliases: []string{"ln"},
-		Action:  listAllNamingPatterns,
+		Action:  listNamingPatterns,
 	}
 
-	ListAllRegexPatterns = &cli.Command{
-		Name:    "listAllRegexPatterns",
-		Usage:   `log-anonymizer listAllRegexPatterns`,
+	ListRegexPatterns = &cli.Command{
+		Name:    "listRegexPatterns",
+		Usage:   `log-anonymizer listRegexPatterns`,
 		Aliases: []string{"lr"},
-		Action:  listAllRegexPatterns,
+		Action:  listRegexPatterns,
 	}
 
 	Commands = []*cli.Command{
-		ListAllNamingPatterns,
-		ListAllRegexPatterns,
+		ListNamingPatterns,
+		ListRegexPatterns,
 	}
 )
 
-// listAllNamingPatterns lists all the naming patterns configured for the anonymizer,
-// grouped by category. It calls GetAllNamingPatterns() on the global config to get
+// listNamingPatterns lists all the naming patterns configured for the anonymizer,
+// grouped by category. It calls GetNamingPatterns() on the global config to get
 // the patterns, then prints them out formatted.
-func listAllNamingPatterns(c *cli.Context) error {
+func listNamingPatterns(c *cli.Context) error {
 	var err error
 
-	namingPatterns, err := GlobalConfig.GetAllNamingPatterns()
+	namingPatterns, err := GlobalConfig.GetNamingPatterns(c.String("fileType"))
 	if err != nil {
 		return err
 	}
@@ -47,13 +47,13 @@ func listAllNamingPatterns(c *cli.Context) error {
 	return err
 }
 
-// listAllRegexPatterns lists all the regex patterns configured for the anonymizer,
-// grouped by category. It calls GetAllRegexPatterns() on the global config to get
+// listRegexPatterns lists all the regex patterns configured for the anonymizer,
+// grouped by category. It calls GetRegexPatterns() on the global config to get
 // the patterns, then prints them out formatted.
-func listAllRegexPatterns(c *cli.Context) error {
+func listRegexPatterns(c *cli.Context) error {
 	var err error
 
-	regexPatterns, err := GlobalConfig.GetAllRegexPatterns()
+	regexPatterns, err := GlobalConfig.GetRegexPatterns(c.String("fileType"))
 	if err != nil {
 		return err
 	}

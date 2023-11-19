@@ -17,7 +17,7 @@ type AnonymizerConfig struct {
 }
 
 type LogConfig struct {
-	Category       string   `yaml:"category"`
+	FileType       string   `yaml:"fileType"`
 	NamingPatterns []string `yaml:"namingPatterns"`
 	RegexPatterns  []string `yaml:"regexPatterns"`
 }
@@ -62,18 +62,21 @@ type NamingPattern struct {
 	Pattern  string
 }
 
-// GetAllNamingPatterns returns all the naming patterns configured for the anonymizer,
-// grouped by category. It loops through all the log configs and extracts the naming
-// patterns into a slice of NamingPattern structs.
-func (cfg *AnonymizerConfig) GetAllNamingPatterns() ([]NamingPattern, error) {
+// GetNamingPatterns returns all the naming patterns configured for the anonymizer
+// that match the given category. It loops through all the LogConfigs and extracts
+// the naming patterns into a slice of NamingPattern structs. Pass "*" to get all
+// naming patterns across all categories.
+func (cfg *AnonymizerConfig) GetNamingPatterns(fileType string) ([]NamingPattern, error) {
 	var namingPatterns = []NamingPattern{}
 
-	for _, log := range cfg.LogConfigs {
-		for _, pattern := range log.NamingPatterns {
-			namingPatterns = append(namingPatterns, NamingPattern{
-				Category: log.Category,
-				Pattern:  pattern,
-			})
+	for _, logCfg := range cfg.LogConfigs {
+		for _, pattern := range logCfg.NamingPatterns {
+			if fileType == logCfg.FileType || fileType == "*" {
+				namingPatterns = append(namingPatterns, NamingPattern{
+					Category: logCfg.FileType,
+					Pattern:  pattern,
+				})
+			}
 		}
 	}
 
@@ -89,38 +92,39 @@ type RegexPattern struct {
 	Regex    string
 }
 
-// GetAllRegexes returns all the regex patterns configured for the anonymizer,
-// grouped by category. It loops through all the LogConfigs and extracts the regexes
-// into a slice of RegexPattern structs.
-func (cfg *AnonymizerConfig) GetAllRegexPatterns() ([]RegexPattern, error) {
-	var regexes = []RegexPattern{}
+// GetRegexPatterns returns all the regex patterns configured for the anonymizer
+// that match the given category. It loops through all the LogConfigs and extracts
+// the regex patterns into a slice of RegexPattern structs. Pass "*" to get all
+// regex patterns across all categories.
+func (cfg *AnonymizerConfig) GetRegexPatterns(fileType string) ([]RegexPattern, error) {
+	var regexPatterns = []RegexPattern{}
 
-	for _, log := range cfg.LogConfigs {
-		for _, regex := range log.RegexPatterns {
-			regexes = append(regexes, RegexPattern{
-				Category: log.Category,
-				Regex:    regex,
-			})
+	for _, logCfg := range cfg.LogConfigs {
+		for _, pattern := range logCfg.RegexPatterns {
+			if fileType == logCfg.FileType || fileType == "*" {
+				regexPatterns = append(regexPatterns, RegexPattern{
+					Category: logCfg.FileType,
+					Regex:    pattern,
+				})
+			}
 		}
 	}
 
-	if len(regexes) == 0 {
-		return regexes, fmt.Errorf("no regexes found for %s", cfg.AxcVersion)
+	if len(regexPatterns) == 0 {
+		return regexPatterns, fmt.Errorf("no regexes found for %s", cfg.AxcVersion)
 	}
 
-	return regexes, nil
-
+	return regexPatterns, nil
 }
 
-// GetLogConfigByCategory returns the LogConfig for the given category from the
-// AnonymizerConfig. It loops through all the LogConfigs and returns the one
-// where the Category matches the passed in category string. If no match is found,
-// it returns an error.
-func (cfg *AnonymizerConfig) GetLogConfigByCategory(category string) (*LogConfig, error) {
+// GetLogConfigByFileType returns the LogConfig for the given fileType.
+// It loops through all the configs and returns the one where FileType matches.
+// Returns error if no matching config is found.
+func (cfg *AnonymizerConfig) GetLogConfigByFileType(fileType string) (*LogConfig, error) {
 	for _, logCfg := range cfg.LogConfigs {
-		if logCfg.Category == category {
+		if logCfg.FileType == fileType {
 			return &logCfg, nil
 		}
 	}
-	return nil, fmt.Errorf("no config found for category %s under %s", category, cfg.AxcVersion)
+	return nil, fmt.Errorf("no config found for file type %s under %s", fileType, cfg.AxcVersion)
 }
