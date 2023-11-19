@@ -16,33 +16,33 @@ var (
 )
 
 var (
-	ListNamingPatterns = &cli.Command{
-		Name:    "listNamingPatterns",
+	ListAllNamingPatterns = &cli.Command{
+		Name:    "listAllNamingPatterns",
 		Usage:   `log-anonymizer listNamingPatterns`,
 		Aliases: []string{"ln"},
 		Flags: []cli.Flag{
 			Version,
 		},
-		Action: listNamingPatterns,
+		Action: listAllNamingPatterns,
 	}
 
-	ListRegexes = &cli.Command{
-		Name:    "listRegexes",
+	ListAllRegexes = &cli.Command{
+		Name:    "listAllRegexes",
 		Usage:   `log-anonymizer listRegexes`,
 		Aliases: []string{"lr"},
 		Flags: []cli.Flag{
 			Version,
 		},
-		Action: listRegexes,
+		Action: listAllRegexes,
 	}
 
 	Commands = []*cli.Command{
-		ListNamingPatterns,
-		ListRegexes,
+		ListAllNamingPatterns,
+		ListAllRegexes,
 	}
 )
 
-func listNamingPatterns(c *cli.Context) error {
+func listAllNamingPatterns(c *cli.Context) error {
 	var err error
 
 	yaml, err := LoadConfig(c.String("config"))
@@ -69,7 +69,7 @@ func listNamingPatterns(c *cli.Context) error {
 	return err
 }
 
-func listRegexes(c *cli.Context) error {
+func listAllRegexes(c *cli.Context) error {
 	var err error
 
 	yaml, err := LoadConfig(c.String("config"))
