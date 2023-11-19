@@ -26,9 +26,9 @@ var (
 		Action: listAllNamingPatterns,
 	}
 
-	ListAllRegexes = &cli.Command{
-		Name:    "listAllRegexes",
-		Usage:   `log-anonymizer listAllRegexes`,
+	ListAllRegexPatterns = &cli.Command{
+		Name:    "listAllRegexPatterns",
+		Usage:   `log-anonymizer listAllRegexPatterns`,
 		Aliases: []string{"lr"},
 		Flags: []cli.Flag{
 			Version,
@@ -38,7 +38,7 @@ var (
 
 	Commands = []*cli.Command{
 		ListAllNamingPatterns,
-		ListAllRegexes,
+		ListAllRegexPatterns,
 	}
 )
 
@@ -82,7 +82,7 @@ func listAllRegexes(c *cli.Context) error {
 		return err
 	}
 
-	regexes, err := cfg.GetAllRegexes()
+	regexes, err := cfg.GetAllRegexPatterns()
 
 	i := 0
 	for _, pattern := range regexes {

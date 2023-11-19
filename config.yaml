@@ -3,21 +3,21 @@ anonymizer:
   - version: default
     logs:
       - category: engine
-        namingPattern: # Log Naming Patterns
+        namingPatterns: # Log Naming Patterns
           - distributedEngine.log 
-        regexes: # Regexes used to search for log entries
+        regexPatterns: # Regexes used to search for log entries
           - ".*Processed login for user '(.*?)'.*display name: '(.*?)'.*email address: '(.*?)'.*SINGLEMINDSERVER.(.*?)[.].*"
           - ".*Start login for user '(.*?)', profile: '(.*?)'.*SINGLEMINDSERVER.(.*?).Security.*"
           - ".*SearchError User : (.*?) Duration .*"
       - category: launcherservice
-        namingPattern:
+        namingPatterns:
           - Launcher
   - version: v22.0
     logs:
       - category: launcherservice
-        namingPattern: # Log Naming Patterns
+        namingPatterns: # Log Naming Patterns
           - Launcher
-        regexes: # Regexes used to search for log entries
+        regexPatterns: # Regexes used to search for log entries
           - ".*Processed login for user '(.*?)'.*display name: '(.*?)'.*email address: '(.*?)'.*SINGLEMINDSERVER.(.*?)[.].*"
           - ".*Start login for user '(.*?)', profile: '(.*?)'.*SINGLEMINDSERVER.(.*?).Security.*"
           - ".*SearchError User : (.*?) Duration .*"

@@ -18,8 +18,8 @@ type AnonymizerConfig struct {
 
 type LogConfig struct {
 	Category       string   `yaml:"category"`
-	NamingPatterns []string `yaml:"namingPattern"`
-	Regexes        []string `yaml:"regexes"`
+	NamingPatterns []string `yaml:"namingPatterns"`
+	RegexPatterns  []string `yaml:"regexPatterns"`
 }
 
 // LoadConfig loads the anonymizer configuration from the YAML file at the given path.
@@ -92,11 +92,11 @@ type RegexPattern struct {
 // GetAllRegexes returns all the regex patterns configured for the anonymizer,
 // grouped by category. It loops through all the LogConfigs and extracts the regexes
 // into a slice of RegexPattern structs.
-func (cfg *AnonymizerConfig) GetAllRegexes() ([]RegexPattern, error) {
+func (cfg *AnonymizerConfig) GetAllRegexPatterns() ([]RegexPattern, error) {
 	var regexes = []RegexPattern{}
 
 	for _, log := range cfg.LogConfigs {
-		for _, regex := range log.Regexes {
+		for _, regex := range log.RegexPatterns {
 			regexes = append(regexes, RegexPattern{
 				Category: log.Category,
 				Regex:    regex,
