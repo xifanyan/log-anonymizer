@@ -35,9 +35,9 @@ var (
 	}
 )
 
-// listNamingPatterns lists all the naming patterns from the configuration
-// that match the given file type. It prints out the list of patterns
-// with index, category, and the pattern string.
+// listNamingPatterns lists all the naming patterns configured for the anonymizer.
+// It prints out the list of patterns with index numbers. The patterns can be
+// filtered by kind using the --kind flag.
 func listNamingPatterns(c *cli.Context) error {
 	var err error
 
@@ -49,15 +49,15 @@ func listNamingPatterns(c *cli.Context) error {
 	i := 0
 	for _, pattern := range namingPatterns {
 		i++
-		fmt.Printf("%-4d%-16s%s\n", i, pattern.Category, pattern.Pattern)
+		fmt.Printf("%-4d%-16s%s\n", i, pattern.Kind, pattern.Pattern)
 	}
 
 	return err
 }
 
-// listRegexPatterns lists all the regex patterns from the configuration
-// that match the given file type. It prints out the list of patterns
-// with index, category, and the regex string.
+// listRegexPatterns lists all the regex patterns configured for the anonymizer.
+// It prints out the list of regexes with index numbers. The regexes can be
+// filtered by kind using the --kind flag.
 func listRegexPatterns(c *cli.Context) error {
 	var err error
 
@@ -69,7 +69,7 @@ func listRegexPatterns(c *cli.Context) error {
 	i := 0
 	for _, pattern := range regexPatterns {
 		i++
-		fmt.Printf("%-4d%-16s%s\n", i, pattern.Category, pattern.Regex)
+		fmt.Printf("%-4d%-16s%s\n", i, pattern.Kind, pattern.Regex)
 	}
 
 	return err

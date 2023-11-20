@@ -58,23 +58,23 @@ func (cfg *AnonymizerConfiguration) GetAnonymizerConfigByAxcVersion(version stri
 }
 
 type NamingPattern struct {
-	Category string
-	Pattern  string
+	Kind    string
+	Pattern string
 }
 
 // GetNamingPatterns returns all the naming patterns configured for the anonymizer
-// that match the given category. It loops through all the LogConfigs and extracts
+// that match the given kind. It loops through all the LogConfigs and extracts
 // the naming patterns into a slice of NamingPattern structs. Pass "*" to get all
-// naming patterns across all categories.
-func (cfg *AnonymizerConfig) GetNamingPatterns(fileType string) ([]NamingPattern, error) {
+// naming patterns across all kinds.
+func (cfg *AnonymizerConfig) GetNamingPatterns(kind string) ([]NamingPattern, error) {
 	var namingPatterns = []NamingPattern{}
 
 	for _, logCfg := range cfg.LogConfigs {
 		for _, pattern := range logCfg.NamingPatterns {
-			if fileType == logCfg.Kind || fileType == "*" {
+			if kind == logCfg.Kind || kind == "*" {
 				namingPatterns = append(namingPatterns, NamingPattern{
-					Category: logCfg.Kind,
-					Pattern:  pattern,
+					Kind:    logCfg.Kind,
+					Pattern: pattern,
 				})
 			}
 		}
@@ -88,14 +88,14 @@ func (cfg *AnonymizerConfig) GetNamingPatterns(fileType string) ([]NamingPattern
 }
 
 type RegexPattern struct {
-	Category string
-	Regex    string
+	Kind  string
+	Regex string
 }
 
 // GetRegexPatterns returns all the regex patterns configured for the anonymizer
-// that match the given category. It loops through all the LogConfigs and extracts
+// that match the given kind. It loops through all the LogConfigs and extracts
 // the regex patterns into a slice of RegexPattern structs. Pass "*" to get all
-// regex patterns across all categories.
+// regex patterns across all kinds.
 func (cfg *AnonymizerConfig) GetRegexPatterns(kind string) ([]RegexPattern, error) {
 	var regexPatterns = []RegexPattern{}
 
@@ -103,8 +103,8 @@ func (cfg *AnonymizerConfig) GetRegexPatterns(kind string) ([]RegexPattern, erro
 		for _, pattern := range logCfg.RegexPatterns {
 			if kind == logCfg.Kind || kind == "*" {
 				regexPatterns = append(regexPatterns, RegexPattern{
-					Category: logCfg.Kind,
-					Regex:    pattern,
+					Kind:  logCfg.Kind,
+					Regex: pattern,
 				})
 			}
 		}
