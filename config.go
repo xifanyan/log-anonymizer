@@ -17,7 +17,7 @@ type AnonymizerConfig struct {
 }
 
 type LogConfig struct {
-	FileType       string   `yaml:"fileType"`
+	Kind           string   `yaml:"kind"`
 	NamingPatterns []string `yaml:"namingPatterns"`
 	RegexPatterns  []string `yaml:"regexPatterns"`
 }
@@ -71,9 +71,9 @@ func (cfg *AnonymizerConfig) GetNamingPatterns(fileType string) ([]NamingPattern
 
 	for _, logCfg := range cfg.LogConfigs {
 		for _, pattern := range logCfg.NamingPatterns {
-			if fileType == logCfg.FileType || fileType == "*" {
+			if fileType == logCfg.Kind || fileType == "*" {
 				namingPatterns = append(namingPatterns, NamingPattern{
-					Category: logCfg.FileType,
+					Category: logCfg.Kind,
 					Pattern:  pattern,
 				})
 			}
@@ -96,14 +96,14 @@ type RegexPattern struct {
 // that match the given category. It loops through all the LogConfigs and extracts
 // the regex patterns into a slice of RegexPattern structs. Pass "*" to get all
 // regex patterns across all categories.
-func (cfg *AnonymizerConfig) GetRegexPatterns(fileType string) ([]RegexPattern, error) {
+func (cfg *AnonymizerConfig) GetRegexPatterns(kind string) ([]RegexPattern, error) {
 	var regexPatterns = []RegexPattern{}
 
 	for _, logCfg := range cfg.LogConfigs {
 		for _, pattern := range logCfg.RegexPatterns {
-			if fileType == logCfg.FileType || fileType == "*" {
+			if kind == logCfg.Kind || kind == "*" {
 				regexPatterns = append(regexPatterns, RegexPattern{
-					Category: logCfg.FileType,
+					Category: logCfg.Kind,
 					Regex:    pattern,
 				})
 			}
@@ -117,14 +117,33 @@ func (cfg *AnonymizerConfig) GetRegexPatterns(fileType string) ([]RegexPattern, 
 	return regexPatterns, nil
 }
 
-// GetLogConfigByFileType returns the LogConfig for the given fileType.
-// It loops through all the configs and returns the one where FileType matches.
-// Returns error if no matching config is found.
-func (cfg *AnonymizerConfig) GetLogConfigByFileType(fileType string) (*LogConfig, error) {
+// GetKinds returns all the log kinds configured for the anonymizer.
+// It loops through the LogConfigs slice in the AnonymizerConfig and extracts
+// the Kind into a string slice.
+func (cfg *AnonymizerConfig) GetKinds() ([]string, error) {
+	var err error
+
+	var kinds = []string{}
 	for _, logCfg := range cfg.LogConfigs {
-		if logCfg.FileType == fileType {
+		kinds = append(kinds, logCfg.Kind)
+	}
+
+	if len(kinds) == 0 {
+		return kinds, fmt.Errorf("no log types found for %s", cfg.AxcVersion)
+	}
+
+	return kinds, err
+}
+
+// GetLogConfigByLogType returns the LogConfig struct for the given logType.
+// It loops through the LogConfigs slice in the AnonymizerConfig and returns
+// the one where LogType matches the passed in logType. If no match is found,
+// it returns an error.
+func (cfg *AnonymizerConfig) GetLogConfigByLogType(kind string) (*LogConfig, error) {
+	for _, logCfg := range cfg.LogConfigs {
+		if logCfg.Kind == kind {
 			return &logCfg, nil
 		}
 	}
-	return nil, fmt.Errorf("no config found for file type %s under %s", fileType, cfg.AxcVersion)
+	return nil, fmt.Errorf("no config found for file type %s under %s", kind, cfg.AxcVersion)
 }
