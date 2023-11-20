@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	DEFAULT_FILETYPE    = "*"
+	DEFAULT_KIND        = "*"
 	DEFAULT_CONFIG      = "config.yaml"
 	DEFAULT_AXC_VERSION = "default"
 	DEFAULT_OBFUSCATION = "_CONFIDENTIAL_"
@@ -24,10 +24,10 @@ func main() {
 		Usage:   "Axcelerate Log Anonymizer",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:    "fileType",
-				Aliases: []string{"t"},
-				Usage:   "File Type",
-				Value:   DEFAULT_FILETYPE,
+				Name:    "kind",
+				Aliases: []string{"k"},
+				Usage:   "kind",
+				Value:   DEFAULT_KIND,
 			},
 			&cli.StringFlag{
 				Name:    "config",

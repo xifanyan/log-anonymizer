@@ -41,7 +41,7 @@ var (
 func listNamingPatterns(c *cli.Context) error {
 	var err error
 
-	namingPatterns, err := GlobalConfig.GetNamingPatterns(c.String("fileType"))
+	namingPatterns, err := GlobalConfig.GetNamingPatterns(c.String("kind"))
 	if err != nil {
 		return err
 	}
@@ -61,7 +61,7 @@ func listNamingPatterns(c *cli.Context) error {
 func listRegexPatterns(c *cli.Context) error {
 	var err error
 
-	regexPatterns, err := GlobalConfig.GetRegexPatterns(c.String("fileType"))
+	regexPatterns, err := GlobalConfig.GetRegexPatterns(c.String("kind"))
 	if err != nil {
 		return err
 	}
