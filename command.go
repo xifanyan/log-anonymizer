@@ -46,10 +46,8 @@ func listNamingPatterns(c *cli.Context) error {
 		return err
 	}
 
-	i := 0
-	for _, pattern := range namingPatterns {
-		i++
-		fmt.Printf("%-4d%-16s%s\n", i, pattern.Kind, pattern.Pattern)
+	for i, pattern := range namingPatterns {
+		fmt.Printf("%-4d%-16s%s\n", i+1, pattern.Kind, pattern.Pattern)
 	}
 
 	return err
@@ -66,10 +64,8 @@ func listRegexPatterns(c *cli.Context) error {
 		return err
 	}
 
-	i := 0
-	for _, pattern := range regexPatterns {
-		i++
-		fmt.Printf("%-4d%-16s%s\n", i, pattern.Kind, pattern.Regex)
+	for i, pattern := range regexPatterns {
+		fmt.Printf("%-4d%-16s%s\n", i+1, pattern.Kind, pattern.Regex)
 	}
 
 	return err
@@ -85,10 +81,8 @@ func listKinds(c *cli.Context) error {
 		return err
 	}
 
-	i := 0
-	for _, kind := range kinds {
-		i++
-		fmt.Printf("%-4d%s\n", i, kind)
+	for i, kind := range kinds {
+		fmt.Printf("%-4d%s\n", i+1, kind)
 	}
 
 	return err
