@@ -26,7 +26,7 @@ func main() {
 			&cli.StringFlag{
 				Name:    "kind",
 				Aliases: []string{"k"},
-				Usage:   "kind",
+				Usage:   "type of log files e.g., engine",
 				Value:   DEFAULT_KIND,
 			},
 			&cli.StringFlag{
@@ -44,13 +44,13 @@ func main() {
 			&cli.StringFlag{
 				Name:    "obfuscation",
 				Aliases: []string{"s"},
-				Usage:   "",
+				Usage:   "obfuscation text",
 				Value:   DEFAULT_OBFUSCATION,
 			},
 			&cli.BoolFlag{
 				Name:    "debug",
 				Aliases: []string{"d"},
-				Usage:   "Debug Mode: Log to stderr and AdpTask log enabled",
+				Usage:   "Debug Mode",
 				Value:   false,
 			},
 		},

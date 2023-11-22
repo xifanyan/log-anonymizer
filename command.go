@@ -35,12 +35,18 @@ var (
 	}
 )
 
-// listNamingPatterns lists all the naming patterns configured for the anonymizer.
-// It prints out the list of patterns with index numbers. The patterns can be
-// filtered by kind using the --kind flag.
+/**
+ * listNamingPatterns is a function that takes a cli.Context as input and returns an error.
+ * It retrieves naming patterns from a global configuration based on the value of the "kind" flag provided in the context.
+ * It then iterates over the retrieved patterns and prints them out with their corresponding index, kind, and pattern.
+ *
+ * Inputs:
+ *     - c: A cli.Context object that contains the command-line context and flags.
+ *
+ * Outputs:
+ *     - Prints out the index, kind, and pattern of each naming pattern.
+ */
 func listNamingPatterns(c *cli.Context) error {
-	var err error
-
 	namingPatterns, err := GlobalConfig.GetNamingPatterns(c.String("kind"))
 	if err != nil {
 		return err
@@ -50,32 +56,43 @@ func listNamingPatterns(c *cli.Context) error {
 		fmt.Printf("%-4d%-16s%s\n", i+1, pattern.Kind, pattern.Pattern)
 	}
 
-	return err
+	return nil
 }
 
-// listRegexPatterns lists all the regex patterns configured for the anonymizer.
-// It prints out the list of regexes with index numbers. The regexes can be
-// filtered by kind using the --kind flag.
+/**
+ * listRegexPatterns is a function that takes a cli.Context object as input and returns an error.
+ * It retrieves regex patterns from a global configuration based on the value of the "kind" flag provided in the context.
+ * It then iterates over the retrieved patterns and prints them out with their corresponding index, kind, and pattern.
+ *
+ * Inputs:
+ *     - c: A cli.Context object that contains the command-line context and flags.
+ *
+ * Outputs:
+ *     - Prints out the index, kind, and pattern of each regex pattern.
+ */
 func listRegexPatterns(c *cli.Context) error {
-	var err error
-
 	regexPatterns, err := GlobalConfig.GetRegexPatterns(c.String("kind"))
 	if err != nil {
 		return err
 	}
 
 	for i, pattern := range regexPatterns {
-		fmt.Printf("%-4d%-16s%s\n", i+1, pattern.Kind, pattern.Regex)
+		fmt.Printf("%-4d%-16s%s\n", i+1, pattern.Kind, pattern.Pattern)
 	}
 
-	return err
+	return nil
 }
 
-// listKinds lists all the log types configured for the anonymizer.
-// It prints out the list of kinds with index numbers.
+/**
+ * listKinds is a function that takes a cli.Context object as input and returns an error. It retrieves kinds from a global configuration and prints them out with their corresponding index.
+ *
+ * Inputs:
+ *     - c: A cli.Context object that contains the command-line context and flags.
+ *
+ * Outputs:
+ *     - Prints out the index and kind of each kind.
+ */
 func listKinds(c *cli.Context) error {
-	var err error
-
 	kinds, err := GlobalConfig.GetKinds()
 	if err != nil {
 		return err
@@ -85,5 +102,5 @@ func listKinds(c *cli.Context) error {
 		fmt.Printf("%-4d%s\n", i+1, kind)
 	}
 
-	return err
+	return nil
 }
