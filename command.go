@@ -28,10 +28,34 @@ var (
 		Action:  listKinds,
 	}
 
+	Run = &cli.Command{
+		Name:  "run",
+		Usage: `log-anonymizer run --path ./service.log`,
+		Flags: []cli.Flag{
+			Path,
+			WorkerCount,
+		},
+		Action: process,
+	}
+
 	Commands = []*cli.Command{
 		ListNamingPatterns,
 		ListRegexPatterns,
 		ListKinds,
+		Run,
+	}
+)
+
+var (
+	Path = &cli.StringFlag{
+		Name:  "path",
+		Usage: "file or folder to be processed",
+	}
+
+	WorkerCount = &cli.IntFlag{
+		Name:  "workerCount",
+		Usage: "number of workers",
+		Value: 2,
 	}
 )
 
@@ -101,6 +125,29 @@ func listKinds(c *cli.Context) error {
 	for i, kind := range kinds {
 		fmt.Printf("%-4d%s\n", i+1, kind)
 	}
+
+	return nil
+}
+
+/**
+* Process files or folders based on command-line flags.
+* Inputs:
+*	c: A cli.Context object that contains the command-line context and flags.
+*
+* Outputs:
+*	err (error): A error that occurred during process.
+ */
+func process(c *cli.Context) error {
+	scheduler := NewScheduler().
+		WithPath(c.String("path")).
+		WithWorkerCount(c.Int("workerCount"))
+
+	filePaths, err := scheduler.Traverse()
+	if err != nil {
+		return err
+	}
+
+	scheduler.Process(filePaths)
 
 	return nil
 }
