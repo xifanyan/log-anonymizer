@@ -11,6 +11,7 @@ import (
 
 type Scheduler struct {
 	path        string
+	kind        string
 	workerCount int
 }
 
@@ -30,6 +31,19 @@ func (s *Scheduler) WithPath(path string) *Scheduler {
 	return s
 }
 
+// WithKind sets the kind field of the Scheduler to the provided kind parameter and returns a pointer to the modified Scheduler.
+//
+// Parameters:
+// - kind (string): The kind to be set for the Scheduler object.
+//
+// Returns:
+// - *Scheduler: A pointer to the modified Scheduler object.
+
+func (s *Scheduler) WithKind(kind string) *Scheduler {
+	s.kind = kind
+	return s
+}
+
 // WithWorkerCount sets the workerCount field of the Scheduler object to the provided workerCount parameter and returns a pointer to the modified Scheduler object.
 //
 // Parameters:
@@ -42,13 +56,28 @@ func (s *Scheduler) WithWorkerCount(workerCount int) *Scheduler {
 	return s
 }
 
-// Traverse traverses a directory and returns a list of file paths.
-// Outputs:
+type logInfo struct {
+	path string
+	kind string
+}
+
+func (s *Scheduler) getKindByPath() (string, error) {
+	return "", nil
+}
+
+// getLogs retrieves log information from the specified path.
 //
-//	filePaths ([]string): A slice containing the absolute paths of all the files in the directory (including subdirectories).
-//	err (error): An error that occurred during the traversal, if any.
-func (s *Scheduler) Traverse() ([]string, error) {
-	var filePaths []string
+// This function walks through the directory tree rooted at the 'path' field of the Scheduler struct.
+// For each file in the directory tree, it checks if the file is not a directory.
+// If the 'kind' field of the Scheduler struct is "*", it identifies the kind of log type.
+// It then retrieves the absolute path of the file and appends it along with the identified log type to the 'logInfos' slice.
+//
+// Returns:
+//   - []logInfo: a slice of logInfo structs containing the path and kind of each log file.
+//   - error: an error, if one occurred during the filepath.Walk function or during the retrieval of the absolute path.
+
+func (s *Scheduler) getLogs() ([]logInfo, error) {
+	var logInfos []logInfo
 
 	err := filepath.Walk(s.path, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -56,50 +85,59 @@ func (s *Scheduler) Traverse() ([]string, error) {
 		}
 
 		if !info.IsDir() {
+			var kind string = "NONE"
+			if s.kind == "*" {
+				// kind of log type is not specified which requires to be identified
+				kind, _ = s.getKindByPath()
+			}
+
 			absPath, err := filepath.Abs(path)
 			if err != nil {
 				return err
 			}
-			filePaths = append(filePaths, absPath)
+			logInfos = append(logInfos, logInfo{path: absPath, kind: kind})
 		}
 		return nil
 	})
 
-	return filePaths, err
+	return logInfos, err
 }
 
-// Process is a method belonging to the Scheduler struct. It takes a slice of file paths as input and processes each file concurrently using goroutines and channels.
+// Process processes log files using a worker pool.
 //
-// Inputs:
-// - filePaths (slice of strings): A list of file paths to be processed.
+// This function creates a worker pool of goroutines to process log files.
+// Each worker goroutine takes a logInfo from the 'pathChan' channel, processes it using the 'processFile' method,
+// and logs any errors that occur during processing.
 //
-// Outputs:
-// None. The method processes the files concurrently but does not return any output.
-func (s *Scheduler) Process(filePaths []string) {
+// Parameters:
+//   - logInfos: a slice of logInfo structs containing the path and kind of each log file.
+//
+// This function does not return any values.
+func (s *Scheduler) Process(logInfos []logInfo) {
 	var wg sync.WaitGroup
-	pathChan := make(chan string, s.workerCount)
+	pathChan := make(chan logInfo, s.workerCount)
 
 	for i := 0; i < s.workerCount; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			for path := range pathChan {
-				if err := s.processFile(path); err != nil {
+			for fi := range pathChan {
+				if err := s.processFile(fi); err != nil {
 					log.Error().Msgf("%s", err)
 				}
 			}
 		}()
 	}
 
-	for _, path := range filePaths {
-		pathChan <- path
+	for _, logInfo := range logInfos {
+		pathChan <- logInfo
 	}
 	close(pathChan)
 
 	wg.Wait()
 }
 
-func (s *Scheduler) processFile(path string) error {
-	fmt.Println("Processing file:", path)
+func (s *Scheduler) processFile(logInfo logInfo) error {
+	fmt.Println("Processing file:", logInfo.path)
 	return nil
 }
