@@ -4,14 +4,33 @@ anonymizer:
     logs:
       - kind: engine
         namingPatterns: # Log Naming Patterns
-          - distributedEngine.log 
+          - MindServer
+          - distributedEngine
         regexPatterns: # Regexes used to search for log entries
           - ".*Processed login for user '(.*?)'.*display name: '(.*?)'.*email address: '(.*?)'.*SINGLEMINDSERVER.(.*?)[.].*"
           - ".*Start login for user '(.*?)', profile: '(.*?)'.*SINGLEMINDSERVER.(.*?).Security.*"
           - ".*SearchError User : (.*?) Duration .*"
-      - kind: launcherservice
+      - kind: service 
         namingPatterns:
-          - Launcher
+          - Service
+        regexPatterns:
+          - ".*Principals for (.*?)\\<\\d{3}.*"
+          - ".*Processed login for user '(.*?)'.*display name: '(.*?)'.*email address: '(.*?)'.*"
+          - ".*Start login for user '(.*?)'.*"
+      - kind: crawler
+        namingPatterns:
+          - Crawl
+        regexPatterns:
+          - ".*Start login for user '(.*?)'.*DATASOURCE.(.*?)[.].*"
+          - ".*Processed login for user '(.*?)'.*display name: '(.*?)'.*email address: '(.*?)'.*DATASOURCE.(.*?)[.].*"
+          - ".*java.class.path.(.*?) DATASOURCE.(.*?)[.].*"
+      - kind: processcontrol
+        namingPatterns:
+          - ProcessControl
+        regexPatterns:
+          - ".*Start login for user '(.*?)'.*"
+          - ".*Processed login for user '(.*?)'.*display name: '(.*?)'.*email address: '(.*?)'.*"
+          - ".*Starting process '(.*?)' by '(.*?)'.*"
   - axcVersion: v22.0
     logs:
       - kind: launcherservice
