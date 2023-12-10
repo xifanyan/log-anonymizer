@@ -12,7 +12,8 @@ const (
 	DEFAULT_KIND        = "*"
 	DEFAULT_CONFIG      = "config.yaml"
 	DEFAULT_AXC_VERSION = "default"
-	DEFAULT_OBFUSCATION = "_CONFIDENTIAL_"
+	DEFAULT_OBFUSCATION = "[*CONFIDENTIAL*]"
+	DEFAULT_WORKERCOUNT = 2
 )
 
 var GlobalConfig *AnonymizerConfig
@@ -46,6 +47,12 @@ func main() {
 				Aliases: []string{"s"},
 				Usage:   "obfuscation text",
 				Value:   DEFAULT_OBFUSCATION,
+			},
+			&cli.IntFlag{
+				Name:    "workerCount",
+				Aliases: []string{"t"},
+				Usage:   "worker count",
+				Value:   DEFAULT_WORKERCOUNT,
 			},
 			&cli.BoolFlag{
 				Name:    "debug",

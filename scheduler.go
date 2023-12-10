@@ -85,7 +85,7 @@ type logFileInfo struct {
 //   - string: The output file name for the log info.
 func (inf logFileInfo) getOutputFileName() string {
 	now := time.Now()
-	ts := fmt.Sprintf("%d%02d%02d.%02d%02d%02d", now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), now.Second())
+	ts := fmt.Sprintf("%d%02d%02d-%02d%02d%02d", now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), now.Second())
 	outputFileName := fmt.Sprintf("%s.anonymized.%s", inf.path, ts)
 	return outputFileName
 }
@@ -147,11 +147,13 @@ func (s *Scheduler) getLogs() ([]logFileInfo, error) {
 			if err != nil {
 				log.Error().Msgf("%s", err)
 			} else {
-				absPath, err := filepath.Abs(path)
-				if err != nil {
-					log.Error().Msgf("%s", err)
-				} else {
-					infos = append(infos, logFileInfo{path: absPath, kind: kind})
+				if !strings.Contains(path, ".anonymized.") {
+					absPath, err := filepath.Abs(path)
+					if err != nil {
+						log.Error().Msgf("%s", err)
+					} else {
+						infos = append(infos, logFileInfo{path: absPath, kind: kind})
+					}
 				}
 			}
 
@@ -267,6 +269,7 @@ func (s *Scheduler) obfuscate(line string, regexes []Pattern) string {
 	for _, re := range regexes {
 		line = re.Regex.ReplaceAllStringFunc(line, func(matched string) string {
 			matches := re.Regex.FindStringSubmatch(matched)
+			log.Debug().Msgf("- [matched] %s", line)
 			for _, match := range matches[1:] {
 				matched = strings.Replace(matched, match, s.obfuscation, 1)
 			}
