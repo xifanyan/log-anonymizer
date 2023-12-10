@@ -141,7 +141,8 @@ func process(c *cli.Context) error {
 	scheduler := NewScheduler().
 		WithPath(c.String("path")).
 		WithKind(c.String("kind")). // defined as global flag in main.go
-		WithWorkerCount(c.Int("workerCount"))
+		WithWorkerCount(c.Int("workerCount")).
+		WithObfuscation(c.String("obfuscation"))
 
 	filePaths, err := scheduler.getLogs()
 	if err != nil {

@@ -1,11 +1,14 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 	"sync"
+	"time"
 
 	"github.com/rs/zerolog/log"
 )
@@ -13,6 +16,7 @@ import (
 type Scheduler struct {
 	path        string
 	kind        string
+	obfuscation string
 	workerCount int
 }
 
@@ -57,9 +61,33 @@ func (s *Scheduler) WithWorkerCount(workerCount int) *Scheduler {
 	return s
 }
 
+// WithObfuscation sets the obfuscation field of the Scheduler object to the provided obfuscation parameter and returns a pointer to the modified Scheduler object.
+//
+// Parameters:
+// - obfuscation (string): the obfuscation string.
+//
+// Returns:
+// - *Scheduler: A pointer to the modified Scheduler object.
+func (s *Scheduler) WithObfuscation(obfuscation string) *Scheduler {
+	s.obfuscation = obfuscation
+	return s
+}
+
 type logFileInfo struct {
-	path string
 	kind string
+	path string
+}
+
+// getOutputFileName returns the output file name for the log file info.
+// It appends ".anonymized" and timestamp to the end of the log file path.
+//
+// Returns:
+//   - string: The output file name for the log info.
+func (inf logFileInfo) getOutputFileName() string {
+	now := time.Now()
+	ts := fmt.Sprintf("%d%02d%02d.%02d%02d%02d", now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), now.Second())
+	outputFileName := fmt.Sprintf("%s.anonymized.%s", inf.path, ts)
+	return outputFileName
 }
 
 // getKindByLogPath identifies the kind of log file based on its path and configured naming patterns.
@@ -168,7 +196,82 @@ func (s *Scheduler) Process(infos []logFileInfo) {
 	wg.Wait()
 }
 
+// processFile processes an individual log file.
+// It reads the log file line by line, applies the configured obfuscation,
+// and writes the anonymized output to a new file.
+//
+// Parameters:
+//   - info: logFileInfo containing log file path and type
+//
+// Returns:
+//   - error: any error encountered while processing the file
 func (s *Scheduler) processFile(info logFileInfo) error {
-	fmt.Println("Processing file:", info.path, "of kind:", info.kind)
+	var err error
+
+	log.Debug().Msgf("processing [%s] log file: %s", info.kind, info.path)
+
+	regexes, err := GlobalConfig.GetRegexPatterns(info.kind)
+	if err != nil {
+		return err
+	}
+
+	inf, err := os.Open(info.path)
+	if err != nil {
+		return err
+	}
+	defer inf.Close()
+
+	outf, err := os.Create(info.getOutputFileName())
+	if err != nil {
+		return err
+	}
+	defer outf.Close()
+
+	fs := bufio.NewScanner(inf)
+
+	wf := bufio.NewWriter(outf)
+
+	for fs.Scan() {
+		line := s.obfuscate(fs.Text(), regexes)
+
+		_, err := fmt.Fprintln(wf, line)
+		if err != nil {
+			log.Error().Msgf("%s", err)
+			return err
+		}
+	}
+
+	if err := fs.Err(); err != nil {
+		log.Error().Msgf("%s", err)
+		return err
+	}
+
+	log.Debug().Msgf("finished processing [%s] log file: %s", info.kind, info.path)
+
 	return nil
+}
+
+// obfuscate takes a log line and a slice of obfuscation patterns, and returns
+// the log line with sensitive information obfuscated.
+//
+// It iterates through each obfuscation pattern and replaces any matches in
+// the log line with the pattern's obfuscation string.
+//
+// Parameters:
+//   - line: the log line to obfuscate
+//   - regexes: slice of obfuscation patterns to apply
+//
+// Returns:
+//   - The obfuscated log line
+func (s *Scheduler) obfuscate(line string, regexes []Pattern) string {
+	for _, re := range regexes {
+		line = re.Regex.ReplaceAllStringFunc(line, func(matched string) string {
+			matches := re.Regex.FindStringSubmatch(matched)
+			for _, match := range matches[1:] {
+				matched = strings.Replace(matched, match, s.obfuscation, 1)
+			}
+			return matched
+		})
+	}
+	return line
 }
