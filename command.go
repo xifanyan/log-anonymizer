@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"os"
 
+	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
 )
 
@@ -28,6 +30,16 @@ var (
 		Action:  listKinds,
 	}
 
+	CleanUp = &cli.Command{
+		Name:    "cleanUp",
+		Usage:   `log-anonymizer cleanUp`,
+		Aliases: []string{"cu"},
+		Flags: []cli.Flag{
+			Path,
+		},
+		Action: cleanUp,
+	}
+
 	Run = &cli.Command{
 		Name:  "run",
 		Usage: `log-anonymizer run --path ./service.log`,
@@ -35,10 +47,11 @@ var (
 			Path,
 			WorkerCount,
 		},
-		Action: process,
+		Action: run,
 	}
 
 	Commands = []*cli.Command{
+		CleanUp,
 		ListNamingPatterns,
 		ListRegexPatterns,
 		ListKinds,
@@ -48,8 +61,9 @@ var (
 
 var (
 	Path = &cli.StringFlag{
-		Name:  "path",
-		Usage: "file or folder to be processed",
+		Name:     "path",
+		Usage:    "file or folder to be processed",
+		Required: true,
 	}
 
 	WorkerCount = &cli.IntFlag{
@@ -130,14 +144,14 @@ func listKinds(c *cli.Context) error {
 }
 
 /**
-* Process files or folders based on command-line flags.
+* Run - Process files or folders based on command-line flags.
 * Inputs:
 *	c: A cli.Context object that contains the command-line context and flags.
 *
 * Outputs:
 *	err (error): A error that occurred during process.
  */
-func process(c *cli.Context) error {
+func run(c *cli.Context) error {
 	scheduler := NewScheduler().
 		WithPath(c.String("path")).
 		WithKind(c.String("kind")). // defined as global flag in main.go
@@ -151,5 +165,35 @@ func process(c *cli.Context) error {
 
 	scheduler.Process(filePaths)
 
+	return nil
+}
+
+// cleanUp deletes the anonymized log files after processing is complete.
+// It gets the slice of anonymized file paths from the context
+// and calls deleteFiles to delete each one.
+//
+// Parameters:
+//   - c: The CLI context containing the anonymized files slice
+//
+// Returns:
+//   - error: Any error encountered while deleting files
+func cleanUp(c *cli.Context) error {
+	var err error
+
+	scheduler := NewScheduler().
+		WithPath(c.String("path"))
+
+	anonymizedLogs, err := scheduler.getAnonymizedLogs()
+	if err != nil {
+		return err
+	}
+
+	for _, f := range anonymizedLogs {
+		err = os.Remove(f)
+		if err != nil {
+			log.Error().Msgf("%s", err)
+			continue
+		}
+	}
 	return nil
 }

@@ -278,3 +278,29 @@ func (s *Scheduler) obfuscate(line string, regexes []Pattern) string {
 	}
 	return line
 }
+
+// getAnonymizedLogs collect anonymized log file names.
+//
+// Returns:
+//   - []string: Slice of paths for the anonymized log files
+//   - error: Any error encountered
+func (s *Scheduler) getAnonymizedLogs() ([]string, error) {
+
+	var paths []string
+
+	err := filepath.Walk(s.path, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if !info.IsDir() {
+			if strings.Contains(path, ".anonymized.") {
+				absPath, _ := filepath.Abs(path)
+				paths = append(paths, absPath)
+			}
+		}
+		return nil
+	})
+
+	return paths, err
+}
