@@ -188,8 +188,14 @@ func cleanUp(c *cli.Context) error {
 		return err
 	}
 
-	for _, f := range anonymizedLogs {
-		err = os.Remove(f)
+	if len(anonymizedLogs) == 0 {
+		log.Info().Msg("No anonymized logs found")
+		return nil
+	}
+
+	for _, anonymized := range anonymizedLogs {
+		log.Debug().Msgf("%s", anonymized)
+		err = os.Remove(anonymized)
 		if err != nil {
 			log.Error().Msgf("%s", err)
 			continue
