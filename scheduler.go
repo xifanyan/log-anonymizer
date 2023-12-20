@@ -223,7 +223,8 @@ func (s *Scheduler) processFile(info logFileInfo) error {
 	}
 	defer inf.Close()
 
-	outf, err := os.Create(info.getOutputFileName())
+	anonymizedFileName := info.getOutputFileName()
+	outf, err := os.Create(anonymizedFileName)
 	if err != nil {
 		return err
 	}
@@ -245,6 +246,11 @@ func (s *Scheduler) processFile(info logFileInfo) error {
 
 	if err := fs.Err(); err != nil {
 		log.Error().Msgf("%s", err)
+		return err
+	}
+
+	if err = wf.Flush(); err != nil {
+		log.Error().Msgf("flushing %s: %s", anonymizedFileName, err)
 		return err
 	}
 

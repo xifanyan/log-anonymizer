@@ -10,15 +10,21 @@ import (
 
 var (
 	ListNamingPatterns = &cli.Command{
-		Name:    "listNamingPatterns",
-		Usage:   `log-anonymizer listNamingPatterns`,
+		Name:  "listNamingPatterns",
+		Usage: `log-anonymizer listNamingPatterns`,
+		Flags: []cli.Flag{
+			Kind,
+		},
 		Aliases: []string{"ln"},
 		Action:  listNamingPatterns,
 	}
 
 	ListRegexPatterns = &cli.Command{
-		Name:    "listRegexPatterns",
-		Usage:   `log-anonymizer listRegexPatterns`,
+		Name:  "listRegexPatterns",
+		Usage: `log-anonymizer listRegexPatterns`,
+		Flags: []cli.Flag{
+			Kind,
+		},
 		Aliases: []string{"lr"},
 		Action:  listRegexPatterns,
 	}
@@ -44,6 +50,7 @@ var (
 		Name:  "run",
 		Usage: `log-anonymizer run --path ./service.log`,
 		Flags: []cli.Flag{
+			Kind,
 			Path,
 			WorkerCount,
 		},
@@ -60,6 +67,12 @@ var (
 )
 
 var (
+	Kind = &cli.StringFlag{
+		Name:  "kind",
+		Usage: "log file type e.g., engine",
+		Value: DEFAULT_KIND,
+	}
+
 	Path = &cli.StringFlag{
 		Name:     "path",
 		Usage:    "file or folder to be processed",
@@ -154,7 +167,7 @@ func listKinds(c *cli.Context) error {
 func run(c *cli.Context) error {
 	scheduler := NewScheduler().
 		WithPath(c.String("path")).
-		WithKind(c.String("kind")). // defined as global flag in main.go
+		WithKind(c.String("kind")).
 		WithWorkerCount(c.Int("workerCount")).
 		WithObfuscation(c.String("obfuscation"))
 

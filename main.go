@@ -25,12 +25,6 @@ func main() {
 		Usage:   "Axcelerate Log Anonymizer",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:    "kind",
-				Aliases: []string{"k"},
-				Usage:   "type of log files e.g., engine",
-				Value:   DEFAULT_KIND,
-			},
-			&cli.StringFlag{
 				Name:    "config",
 				Aliases: []string{"c"},
 				Usage:   "Anonymizer configuration file path",
