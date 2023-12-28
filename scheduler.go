@@ -138,6 +138,13 @@ func (s *Scheduler) getLogs() ([]logFileInfo, error) {
 		if !info.IsDir() {
 			var kind string
 
+			// skip hidden files
+			baseName := filepath.Base(path)
+			if strings.HasPrefix(baseName, ".") {
+				return nil
+			}
+
+			// get kind of log file
 			if s.kind == "*" {
 				kind, err = s.getKindByLogPath(path)
 			} else {
@@ -300,7 +307,8 @@ func (s *Scheduler) getAnonymizedLogs() ([]string, error) {
 		}
 
 		if !info.IsDir() {
-			if strings.Contains(path, ".anonymized.") {
+			baseName := filepath.Base(path)
+			if strings.Contains(baseName, ".anonymized.") {
 				absPath, _ := filepath.Abs(path)
 				paths = append(paths, absPath)
 			}
