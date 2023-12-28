@@ -147,20 +147,20 @@ func (s *Scheduler) getLogs() ([]logFileInfo, error) {
 			// get kind of log file
 			if s.kind == "*" {
 				kind, err = s.getKindByLogPath(path)
+				if err != nil {
+					log.Warn().Msgf("%s", err)
+					return nil
+				}
 			} else {
 				kind = s.kind
 			}
 
-			if err != nil {
-				log.Error().Msgf("%s", err)
-			} else {
-				if !strings.Contains(path, ".anonymized.") {
-					absPath, err := filepath.Abs(path)
-					if err != nil {
-						log.Error().Msgf("%s", err)
-					} else {
-						infos = append(infos, logFileInfo{path: absPath, kind: kind})
-					}
+			if !strings.Contains(path, ".anonymized.") {
+				absPath, err := filepath.Abs(path)
+				if err != nil {
+					log.Error().Msgf("%s", err)
+				} else {
+					infos = append(infos, logFileInfo{path: absPath, kind: kind})
 				}
 			}
 
