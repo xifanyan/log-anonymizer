@@ -155,10 +155,10 @@ func (s *Scheduler) getLogs() ([]logFileInfo, error) {
 				kind = s.kind
 			}
 
-			if !strings.Contains(path, ".anonymized.") {
+			if !strings.Contains(baseName, ".anonymized.") {
 				absPath, err := filepath.Abs(path)
 				if err != nil {
-					log.Error().Msgf("%s", err)
+					log.Warn().Msgf("%s", err)
 				} else {
 					infos = append(infos, logFileInfo{path: absPath, kind: kind})
 				}
