@@ -120,9 +120,10 @@ func (s *Scheduler) getKindByLogPath(logFilePath string) (string, error) {
 	return "", err
 }
 
-// getLogs retrieves log information from the specified path.
-// It walks the provided path and collects information about each log file found.
-// For each log file, it determines the kind of log based on configured naming patterns.
+// getLogs walks the scheduler's configured path, collects information
+// about each log file, determines the kind of log based on configured
+// naming patterns, and returns a slice of logFileInfo structs
+// containing the path and kind of each log file.
 //
 // Returns:
 //   - []logInfo: a slice of logInfo structs containing the path and kind of each log file.
@@ -140,30 +141,23 @@ func (s *Scheduler) getLogs() ([]logFileInfo, error) {
 
 			// skip hidden files
 			baseName := filepath.Base(path)
-			if strings.HasPrefix(baseName, ".") {
+			if strings.HasPrefix(baseName, ".") || strings.Contains(baseName, ".anonymized.") {
 				return nil
 			}
 
 			// get kind of log file
-			if s.kind == "*" {
+			kind = s.kind
+			if kind == "*" {
 				kind, err = s.getKindByLogPath(path)
 				if err != nil {
 					log.Warn().Msgf("%s", err)
 					return nil
 				}
-			} else {
-				kind = s.kind
 			}
 
-			if !strings.Contains(baseName, ".anonymized.") {
-				absPath, err := filepath.Abs(path)
-				if err != nil {
-					log.Warn().Msgf("%s", err)
-				} else {
-					infos = append(infos, logFileInfo{path: absPath, kind: kind})
-				}
+			if absPath, err := filepath.Abs(path); err == nil {
+				infos = append(infos, logFileInfo{path: absPath, kind: kind})
 			}
-
 		}
 		return nil
 	})
